@@ -1,0 +1,35 @@
+[tool.poetry]
+name = "prueba"
+version = "0.1.0"
+description = ""
+authors = ["Daniel Betancur <alchemist316@hotmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+mlflow = "^2.8.0"
+ipython = "^8.17.2"
+jupyter = "^1.0.0"
+seaborn = "^0.13.0"
+xgboost = "^2.0.2"
+hyperopt = "^0.2.7"
+prefect = "^2.14.5"
+nltk = "^3.8.1"
+wordcloud = "^1.9.2"
+transformers = "^4.35.2"
+torch = "^2.1.1"
+boto3 = "^1.33.6"
+evidently = "^0.4.12"
+PyMuPDF= "1.24.4"
+pillow=  "10.3.0"
+openai= "1.30.3"
+
+
+
+[tool.poetry.group.dev.dependencies]
+fastapi = "^0.104.1"
+uvicorn = "^0.24.0.post1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
