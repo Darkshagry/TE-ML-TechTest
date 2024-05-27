@@ -1,88 +1,137 @@
-# TE-ML-TechTest
+Clasificador de Valor de Cliente
+-
 
-## Task Description: 
-The task is to build a system that can extract names and last names from a scanned
-PDF document, identify their bounding box locations, and provide an API endpoint to perform fuzzy
-matching between the extracted names and the names provided in the request.
+Descripción
+-
+Este proyecto desarrolla un sistema de extracción de información de los documentos pdf de los contratos del cliente. En el cual, extrae el documento recibido por un api request, junto con un nombre, busca el nombre principal en el documento asistiendose de un modelo LLM GPT 3.5 turbo 16k. Para luego de encontrar el principal nombre, compararlo con el nombre enviado por el request con fuzzy match, verificar la similitud y devolver la información. La respuesta del API Request solo devuelve un indicador y un nombre si el fuzzy match da por encima de 90%. Además, si esta condición se cumple, devuelve tambien las coordenadas del nombre encontrado en el documento, y su bounding box. En caso de ser desplegada,se debe contar con un hardware similar al T4 Gpu de google, para procesar la vectorización de la base de datos. La base de datos vectorizara se realiza local.
 
-Create a Branch and make a pull request to this repository.
 
-## Requirements:
 
-1. Use an open-source OCR library to extract text from the scanned PDF document.
-2. Implement a named entity recognition (NER) or a large language model (LLM) approach to
-identify and extract names and last names from the extracted text.
-3. Parse the extracted text and OCR results to find the bounding box coordinates of the identified
-names and last names.
-4. Create a RESTful API using FastAPI or Flask that accepts a scanned PDF file and a set of
-name-last name pairs as input.
-5. Perform fuzzy matching (with a similarity threshold of 90%) between the extracted names and
-the provided names in the API request.
-6. Return the extracted names, their bounding box coordinates, and the fuzzy matching results as a
-JSON response.
-7. Implement a vector database (e.g., Chroma, Qdrant) to store the extracted text from the PDF
-documents.
-8. Use an open-source embedding model (e.g., Sentence-BERT, Universal Sentence Encoder) to
-convert the extracted text into vector representations and store them in the vector database.
-9. Create another RESTful API endpoint that accepts a question as input and returns an answer
-based on the RAG strategy.
-10.Create a Docker container image for the entire application, including the text extraction, named
-entity recognition, bounding box parsing, vector database, and RAG components. Ensure that
-the container can be built and run using Docker commands or a Docker Compose file. Include
-instructions for running the containerized application and accessing the API endpoints.
-Test Steps:
-1. Set up the Development Environment:
-• Create a new Python virtual environment and install the required libraries (e.g.,
-PyMuPDF, Tesseract OCR, spaCy, Hugging Face Transformers, FastAPI or Flask).
-• Obtain a sample scanned PDF document containing names and last names for testing
-purposes.
-2. Implement Text Extraction from PDF:
-• Use PyMuPDF or a similar library to extract text from the scanned PDF document.
-• Optionally, you can preprocess the extracted text (e.g., remove newlines, clean up
-formatting) for better NER or LLM performance.
-3. Implement Named Entity Recognition (NER) or LLM Approach:
-• Use spaCy's pre-trained NER model or a custom NER model trained on a relevant
-dataset to identify names and last names in the extracted text.
-• Alternatively, use a pre-trained NER (e.g., BERT, RoBERTa) from the Hugging Face
-Transformers library for the named entity recognition task. It is easier to use a
-Generative LLM for zero-shot NER and return the response as an usable JSON.
-4. Parse Bounding Box Coordinates:
-• Integrate the OCR library (e.g., Tesseract OCR) to obtain the bounding box coordinates
-of the recognized words in the PDF document.
-• Match the extracted names and last names with their corresponding bounding box
-coordinates from the OCR results.
-5. Implement the RESTful API:
-• Use FastAPI or Flask to create a RESTful API endpoint that accepts a scanned PDF file
-and a set of name-last name pairs as input.
-• Perform the text extraction, named entity recognition, and bounding box parsing steps
-on the uploaded PDF file.
-• Implement fuzzy matching (e.g., using the python-fuzzy library) between the extracted
-names and the provided names in the API request, with a similarity threshold of 90%.
-• Return the extracted names, their bounding box coordinates, and the fuzzy matching
-results as a JSON response.
-6. Set up a Vector Database:
-• Choose and install an open-source vector database solution (e.g., Chroma, Qdrant,
-Milvus) compatible with your development environment. If you are using a docker
-image of an open-source database, make sure to include it in the docker compose file.
-• Create a new database or collection within the vector database to store the extracted text
-from the PDF documents.
-7. Implement Text Embedding:
-• Use an open-source embedding model like Sentence-BERT or Universal Sentence
-Encoder to convert the extracted text into vector representations.
-• Integrate the embedding model with the vector database to store the text embeddings
-along with their corresponding text snippets.
-8. Implement Retrieval-Augmented Generation (RAG):
-• Create a new RESTful API endpoint that accepts a question as input.
-• Implement the RAG strategy to retrieve relevant text snippets from the vector database
-based on the similarity between the question embedding and the stored text embeddings.
-• Use a pre-trained language model (e.g., GPT-3.5, Gemini) to generate an answer based
-on the retrieved text snippets and the input question.
-• Return the generated answer as the response to the API request.
-9. Containerization:
-• Create a new Dockerfile in the project directory with all the required dependencies to
-run the API server.
-• If required, generate a docker-compose file.
-10.Documentation and Submission:
-• Document the code, and any external libraries or resources used.
-• Provide instructions for setting up and running the system, as well as any additional
-dependencies or requirements.
+Tecnologías
+-
+El proyecto está implementado usando las siguientes tecnologías:
+
+Python 3.9+
+
+Llama index para la arquitectura RAG
+
+Pydantic y FastApi para la creación de las Rest api
+Modelos y librerias de Open Ai 
+PyMuPDF para el manejo de archivos PDF 
+Docker y poetry para la gestión de environments y contenedor
+Configuración del Entorno
+-
+Cómo Ejecutar!?
+
+El primer paso es asegurarse de tener python 3.9+ y pip como gestor de archivos de descarga instalado en el equipo local, ademas de docker instalado y testeado en tu máquina local
+
+Luego se debe instalar la libreria poetry, con el siguiente comando
+
+
+```bash
+   pip install poetry
+--
+
+Navega en el directorio en bash para ejecutar el entorno, una vez adentro de la carpeta, ejecutar:
+
+
+
+   poetry install
+
+   poetry shell
+```
+
+Una vez ejecutado el entorno, ejecutar el docker-compose
+
+docker-compose build
+
+docker-compose up
+
+Luego, el contenedor se habrá ejecutado en local y estará listo para recibir los request
+
+
+el cuerpo de los request en ambas APIS debe seguir la siguiente estructura
+
+-value1: Name
+
+-value2: Lastnames
+
+-file: (pdf file here)
+
+El cuerpo debe ser enviado al siguiente puerto y endpoint:
+
+http://localhost:5004/predict
+
+
+Como form-data, el api debe entregar los siguientes campos:
+
+
+    "similarity": 84,
+    "concatenated": "Extracted info from LLM",
+    "bbox": [],
+
+Para utilizar el endpoint de la RAG, debe ser enviado a este puerto y endpoint:
+
+{
+    "value1": "query"
+}
+
+http://localhost:5004/asemble
+
+Con la estructura de respuesta:
+
+{
+    "respuesta": "Respuesta"
+}
+
+
+Navigate to the directory in bash to set up the environment. Once inside the folder, execute:
+
+
+```bash
+poetry install
+poetry shell
+
+Once the environment is set up, run Docker Compose:
+
+```bash
+docker-compose build
+docker-compose up
+
+After that, the container will be running locally and will be ready to receive requests.
+
+API Request Structure
+The body of the requests in both APIs should follow the following structure:
+
+value1: Name
+value2: Lastnames
+file: (PDF file here)
+The body should be sent to the following port and endpoint:
+
+http://localhost:5004/predict
+
+
+As form-data, the API should return the following fields:
+
+```json
+{
+    "similarity": 84,
+    "concatenated": "Extracted info from LLM",
+    "bbox": []
+}
+
+
+To use the RAG endpoint, it should be sent to this port and endpoint:
+```json
+{
+    "value1": "query"
+}
+
+http://localhost:5004/assemble
+
+With the response structure:
+```json
+{
+    "response": "Response"
+}
+
